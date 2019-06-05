@@ -1,0 +1,44 @@
+{% load url from future %}
+
+<script>
+
+$(function() {
+
+  var pluginIndex = {{ forloop.counter }};
+  var url="{% url 'getProjectDashboard' %}";
+
+
+  $("#project_dashboard_panel").omeroweb_center_plugin({
+    plugin_index: pluginIndex,        // From the Django template loop
+    empty_on_sel_change: false,       // Do not completely erase content when changing selection
+    load_plugin_content: function(selected, dtype, oid) {
+
+      // this may have been called before datatree was initialised...
+      var datatree = $.jstree.reference('#dataTree');
+      if (!datatree) return;
+
+      // We use the tree to access selected objects, since we can traverse
+      // to check parents etc...
+      // Note: We do not use the parameters selected, dtype or oid as
+      // it is easier to use the tree directly as these do not refer to
+      // a jstree node
+      var tree_selected = datatree.get_selected(true);
+
+      if (tree_selected === undefined) {
+        return;
+      }
+
+      // TODO Handle multi-selection
+      var selected = tree_selected[0];
+
+      if (selected.type === 'project'){
+		    $(this).load(url, {"projectId":oid});
+		    // $('#annotation_tabs').tabs({disabled: []}).find('a[href="#receptor_experiment_tab"]').trigger('click');
+		    // $('#receptor_experiment_tab div').empty();
+      }
+    },
+    supported_obj_types: ['project']
+  });
+});
+
+</script>
